@@ -5,23 +5,30 @@ const search = async (req, res) => {
   const { q = '' } = req.query;
   const term = q.trim();
 
-  if (!term) {
-    return res.json({ results: [], total: 0 });
-  }
-
   try {
-    const like = `%${term}%`;
-    const result = await pool.query(
-      `SELECT id, full_name, member_id, dob, sex, phone, email, state, city
-       FROM patients
-       WHERE full_name ILIKE $1
-          OR member_id ILIKE $1
-          OR phone     ILIKE $1
-          OR email     ILIKE $1
-       ORDER BY full_name ASC
-       LIMIT 50`,
-      [like]
-    );
+    let result;
+    if (!term) {
+      // Sin término → devuelve todos los pacientes ordenados por nombre
+      result = await pool.query(
+        `SELECT id, full_name, member_id, dob, sex, phone, email, state, city
+         FROM patients
+         ORDER BY full_name ASC
+         LIMIT 100`
+      );
+    } else {
+      const like = `%${term}%`;
+      result = await pool.query(
+        `SELECT id, full_name, member_id, dob, sex, phone, email, state, city
+         FROM patients
+         WHERE full_name ILIKE $1
+            OR member_id ILIKE $1
+            OR phone     ILIKE $1
+            OR email     ILIKE $1
+         ORDER BY full_name ASC
+         LIMIT 50`,
+        [like]
+      );
+    }
     res.json({ results: result.rows, total: result.rows.length });
   } catch (err) {
     console.error('[Patients] Error en búsqueda:', err.message);
