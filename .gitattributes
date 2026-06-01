@@ -1,0 +1,14 @@
+# Normalizar line endings en todos los archivos de texto
+* text=auto
+
+# Forzar LF en archivos de código
+*.js   text eol=lf
+*.jsx  text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.sql  text eol=lf
+*.yml  text eol=lf
+*.md   text eol=lf
+Dockerfile text eol=lf
+*.conf text eol=lf
