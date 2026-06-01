@@ -61,7 +61,7 @@ const History = () => {
     setAlert(null);
     client.get(`/history?date=${d}`)
       .then((res) => setData(res.data))
-      .catch(() => setAlert({ type: 'error', message: 'Error al obtener el historial.' }))
+      .catch((err) => setAlert({ type: 'error', message: err.networkError ? err.userMessage : 'Error al obtener el historial.' }))
       .finally(() => setLoading(false));
   };
 

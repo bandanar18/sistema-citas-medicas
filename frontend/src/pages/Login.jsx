@@ -1,24 +1,33 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
+  const { login, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  // Si ya tiene sesión activa, redirige al dashboard
+  if (!authLoading && user) {
+    return <Navigate to="/" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await login(username, password);
+      await login(username.trim(), password);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Error al iniciar sesión. Intente nuevamente.');
+      if (!err.response) {
+        setError('No se puede conectar al servidor. Verifique su conexión.');
+      } else {
+        setError(err.response?.data?.error || 'Error al iniciar sesión. Intente nuevamente.');
+      }
     } finally {
       setLoading(false);
     }
@@ -41,6 +50,7 @@ const Login = () => {
               style={styles.input}
               required
               autoFocus
+              autoComplete="username"
             />
           </div>
 
@@ -53,10 +63,15 @@ const Login = () => {
               placeholder="Ingrese su contraseña"
               style={styles.input}
               required
+              autoComplete="current-password"
             />
           </div>
 
-          {error && <p style={styles.error}>{error}</p>}
+          {error && (
+            <div style={styles.errorBox}>
+              {error}
+            </div>
+          )}
 
           <button type="submit" style={styles.btnPrimary} disabled={loading}>
             {loading ? 'Ingresando...' : 'Ingresar'}
@@ -112,14 +127,15 @@ const styles = {
     outline: 'none',
     fontSize: '0.95rem',
     boxSizing: 'border-box',
+    fontFamily: 'inherit',
   },
-  error: {
+  errorBox: {
     color: 'var(--rojo-error)',
     fontSize: '0.875rem',
     marginBottom: '15px',
     textAlign: 'left',
     backgroundColor: '#fdf2f2',
-    padding: '10px',
+    padding: '10px 14px',
     borderRadius: '5px',
     border: '1px solid #f5c6cb',
   },

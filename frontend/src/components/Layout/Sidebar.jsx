@@ -3,11 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const NAV_ITEMS = [
-  { label: 'Motor de Búsqueda',       path: '/'             },
-  { label: 'Registro de Pacientes',   path: '/patients/new' },
-  { label: 'Control de Citas Médicas', path: '/appointments/new' },
-  { label: 'Reportes',                path: '/reports'      },
-  { label: 'Historial',               path: '/history'      },
+  { label: 'Motor de Búsqueda',        path: '/',                activeFor: ['/', '/patients/'] },
+  { label: 'Registro de Pacientes',    path: '/patients/new',    activeFor: ['/patients/new']   },
+  { label: 'Control de Citas Médicas', path: '/appointments/new',activeFor: ['/appointments/']  },
+  { label: 'Reportes',                 path: '/reports',          activeFor: ['/reports']        },
+  { label: 'Historial',                path: '/history',          activeFor: ['/history']        },
 ];
 
 const Sidebar = () => {
@@ -20,9 +20,14 @@ const Sidebar = () => {
     navigate('/login');
   };
 
-  const isActive = (path) => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path);
+  const isActive = (item) => {
+    const p = location.pathname;
+    return item.activeFor.some((prefix) => {
+      if (prefix === '/') return p === '/';
+      // /patients/new debe ser exacto para no colisionar con /patients/:id
+      if (prefix === '/patients/new') return p === '/patients/new';
+      return p.startsWith(prefix);
+    });
   };
 
   return (
@@ -35,7 +40,7 @@ const Sidebar = () => {
             key={item.path}
             style={{
               ...styles.navBtn,
-              ...(isActive(item.path) ? styles.navBtnActive : {}),
+              ...(isActive(item) ? styles.navBtnActive : {}),
             }}
             onClick={() => navigate(item.path)}
           >

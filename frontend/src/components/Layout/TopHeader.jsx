@@ -1,25 +1,21 @@
 import React from 'react';
 
-const TITLES = {
-  '/':                 'Motor de Búsqueda',
-  '/patients/new':     'Registrar Paciente Nuevo',
-  '/patients':         'Detalle del Paciente',
-  '/appointments/new': 'Agendar Cita Médica',
-  '/reports':          'Reportes Diarios',
-  '/history':          'Historial de Acciones',
+const getTitle = (pathname) => {
+  if (pathname === '/')                                   return 'Motor de Búsqueda';
+  if (pathname === '/patients/new')                      return 'Registrar Paciente Nuevo';
+  if (/^\/patients\/\d+\/edit$/.test(pathname))         return 'Editar Paciente';
+  if (/^\/patients\/\d+$/.test(pathname))               return 'Detalle del Paciente';
+  if (pathname.startsWith('/appointments'))              return 'Agendar Cita Médica';
+  if (pathname.startsWith('/reports'))                   return 'Reportes Diarios';
+  if (pathname.startsWith('/history'))                   return 'Historial de Acciones';
+  return 'Panel de Control';
 };
 
-const TopHeader = ({ pathname }) => {
-  const title = Object.entries(TITLES).find(([key]) =>
-    key === '/' ? pathname === '/' : pathname.startsWith(key)
-  )?.[1] || 'Panel de Control';
-
-  return (
-    <header style={styles.header}>
-      <h2 style={styles.title}>{title}</h2>
-    </header>
-  );
-};
+const TopHeader = ({ pathname }) => (
+  <header style={styles.header}>
+    <h2 style={styles.title}>{getTitle(pathname)}</h2>
+  </header>
+);
 
 const styles = {
   header: {

@@ -38,7 +38,7 @@ const PatientForm = ({ mode }) => {
           email: p.email || '',
         });
       })
-      .catch(() => setAlert({ type: 'error', message: 'No se pudo cargar la información del paciente.' }))
+      .catch((err) => setAlert({ type: 'error', message: err.networkError ? err.userMessage : 'No se pudo cargar la información del paciente.' }))
       .finally(() => setLoadingData(false));
   }, [id, isEdit]);
 
@@ -79,7 +79,9 @@ const PatientForm = ({ mode }) => {
         setTimeout(() => navigate(`/patients/${res.data.id}`), 1200);
       }
     } catch (err) {
-      const msg = err.response?.data?.error || 'Error al guardar el paciente.';
+      const msg = err.networkError
+        ? err.userMessage
+        : err.response?.data?.error || 'Error al guardar el paciente.';
       const field = err.response?.data?.field;
       if (field) setErrors((prev) => ({ ...prev, [field]: msg }));
       setAlert({ type: 'error', message: msg });

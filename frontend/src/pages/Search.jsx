@@ -30,9 +30,10 @@ const Search = () => {
         setResults(res.data.results);
         setSearched(true);
       })
-      .catch(() => {
+      .catch((err) => {
         setResults([]);
         setSearched(true);
+        if (err.networkError) console.warn(err.userMessage);
       })
       .finally(() => setLoading(false));
   }, [debouncedQuery]);

@@ -103,11 +103,12 @@ const AppointmentForm = () => {
       setAlert({ type: 'success', message: '¡Cita agendada exitosamente!' });
       setTimeout(() => navigate(`/patients/${patientId}`), 1400);
     } catch (err) {
-      const data = err.response?.data;
-      if (data?.conflict) {
-        setAlert({ type: 'warning', message: data.error });
+      if (err.networkError) {
+        setAlert({ type: 'error', message: err.userMessage });
+      } else if (err.response?.data?.conflict) {
+        setAlert({ type: 'warning', message: err.response.data.error });
       } else {
-        setAlert({ type: 'error', message: data?.error || 'Error al agendar la cita.' });
+        setAlert({ type: 'error', message: err.response?.data?.error || 'Error al agendar la cita.' });
       }
     } finally {
       setLoading(false);

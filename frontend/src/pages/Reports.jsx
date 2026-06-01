@@ -29,7 +29,7 @@ const Reports = () => {
     setAlert(null);
     client.get(`/reports/daily?date=${d}`)
       .then((res) => setData(res.data))
-      .catch(() => setAlert({ type: 'error', message: 'Error al generar el reporte. Intente nuevamente.' }))
+      .catch((err) => setAlert({ type: 'error', message: err.networkError ? err.userMessage : 'Error al generar el reporte. Intente nuevamente.' }))
       .finally(() => setLoading(false));
   };
 
