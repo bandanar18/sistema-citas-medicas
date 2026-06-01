@@ -1,6 +1,7 @@
 {
   "name": "medical-system-frontend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Frontend React para el Sistema de Control de Agendas de Citas Médicas",
   "scripts": {
     "dev": "vite",

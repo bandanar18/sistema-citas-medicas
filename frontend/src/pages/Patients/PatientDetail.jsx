@@ -32,7 +32,7 @@ const PatientDetail = () => {
   useEffect(() => {
     client.get(`/patients/${id}`)
       .then((res) => setPatient(res.data))
-      .catch(() => setAlert({ type: 'error', message: 'No se pudo cargar el paciente.' }));
+      .catch((err) => setAlert({ type: 'error', message: err.networkError ? err.userMessage : 'No se pudo cargar el paciente.' }));
   }, [id]);
 
   if (!patient && !alert) {

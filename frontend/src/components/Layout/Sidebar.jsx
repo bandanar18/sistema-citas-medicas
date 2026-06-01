@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -14,6 +14,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [hoveredPath, setHoveredPath] = useState(null);
 
   const handleLogout = async () => {
     await logout();
@@ -24,10 +25,19 @@ const Sidebar = () => {
     const p = location.pathname;
     return item.activeFor.some((prefix) => {
       if (prefix === '/') return p === '/';
-      // /patients/new debe ser exacto para no colisionar con /patients/:id
       if (prefix === '/patients/new') return p === '/patients/new';
       return p.startsWith(prefix);
     });
+  };
+
+  const getNavBtnStyle = (item) => {
+    const active  = isActive(item);
+    const hovered = hoveredPath === item.path && !active;
+    return {
+      ...styles.navBtn,
+      ...(active  ? styles.navBtnActive  : {}),
+      ...(hovered ? styles.navBtnHovered : {}),
+    };
   };
 
   return (
@@ -38,11 +48,10 @@ const Sidebar = () => {
         {NAV_ITEMS.map((item) => (
           <button
             key={item.path}
-            style={{
-              ...styles.navBtn,
-              ...(isActive(item) ? styles.navBtnActive : {}),
-            }}
+            style={getNavBtnStyle(item)}
             onClick={() => navigate(item.path)}
+            onMouseEnter={() => setHoveredPath(item.path)}
+            onMouseLeave={() => setHoveredPath(null)}
           >
             {item.label}
           </button>
@@ -51,7 +60,12 @@ const Sidebar = () => {
 
       <div style={styles.userInfo}>
         <p style={styles.userName}>{user?.full_name || 'Usuario Activo'}</p>
-        <button style={styles.logoutBtn} onClick={handleLogout}>
+        <button
+          style={styles.logoutBtn}
+          onClick={handleLogout}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--gris-claro)')}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+        >
           Cerrar Sesión
         </button>
       </div>
@@ -99,6 +113,11 @@ const styles = {
     borderLeft: '4px solid var(--azul-mar)',
     fontWeight: 'bold',
   },
+  navBtnHovered: {
+    backgroundColor: 'var(--blanco-fondo)',
+    color: 'var(--azul-mar)',
+    borderLeft: '4px solid var(--gris-claro)',
+  },
   userInfo: {
     padding: '20px',
     borderTop: '1px solid var(--gris-claro)',
@@ -119,6 +138,7 @@ const styles = {
     cursor: 'pointer',
     width: '100%',
     fontSize: '0.9rem',
+    transition: 'background 0.2s',
   },
 };
 
